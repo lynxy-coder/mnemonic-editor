@@ -6,6 +6,8 @@
 Продолжение проектов [office-dashboard](https://github.com/lynxy-coder/office-dashboard)
 и [event-journal](https://github.com/lynxy-coder/event-journal). Без фреймворков: HTML, SVG, CSS и JavaScript.
 
+**[Открыть демо](https://lynxy-coder.github.io/mnemonic-editor/)**
+
 ![Редактор мнемосхем](docs/screenshot.png)
 
 ## Что умеет
