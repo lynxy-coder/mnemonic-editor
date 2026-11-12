@@ -17,18 +17,20 @@ export function attachEditor(svg, palette, app) {
   }
 
   svg.addEventListener('pointerdown', (e) => {
-    if (app.mode() !== 'edit') return;
+    // только основная кнопка мыши; пока тянем одним пальцем, второй палец игнорируем
+    if (app.mode() !== 'edit' || e.button !== 0) return;
+    if (drag && drag.pointerId !== e.pointerId) return;
     const g = e.target.closest('.el');
     if (!g) return app.select(null);
 
     const el = app.scheme().elements.find((x) => x.id === g.dataset.id);
-    drag = { el, start: point(e), orig: { ...el }, handle: e.target.dataset.handle, moved: false };
+    drag = { el, start: point(e), orig: { ...el }, handle: e.target.dataset.handle, moved: false, pointerId: e.pointerId };
     svg.setPointerCapture(e.pointerId);
     app.select(el.id);
   });
 
   svg.addEventListener('pointermove', (e) => {
-    if (!drag) return;
+    if (!drag || e.pointerId !== drag.pointerId) return;
     const p = point(e);
     const dx = p.x - drag.start.x;
     const dy = p.y - drag.start.y;
@@ -57,8 +59,9 @@ export function attachEditor(svg, palette, app) {
     app.redrawCanvas();
   });
 
-  function endDrag() {
-    if (drag && drag.moved) app.commit();
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    if (drag.moved) app.commit();
     drag = null;
   }
   svg.addEventListener('pointerup', endDrag);
@@ -93,8 +96,9 @@ export function attachEditor(svg, palette, app) {
   svg.addEventListener('dragover', (e) => e.preventDefault());
   svg.addEventListener('drop', (e) => {
     e.preventDefault();
+    if (app.mode() !== 'edit') return;
     const type = e.dataTransfer.getData('text/plain');
-    if (!TYPES[type]) return;
+    if (!Object.hasOwn(TYPES, type)) return;
     const p = point(e);
     place(type, clamp(p.x, 0, WIDTH), clamp(p.y, 0, HEIGHT));
   });

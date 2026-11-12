@@ -16,11 +16,11 @@ function group(el, selectedId, mode) {
            <circle class="handle" data-handle="2" cx="${el.x2}" cy="${el.y2}" r="7"/>`
         : '';
     const text = label ? `<text class="label" x="${mx}" y="${my - 14}">${label}</text>` : '';
-    return `<g class="${cls}" data-id="${el.id}">${drawElement(el)}${text}${handles}</g>`;
+    return `<g class="${cls}" data-id="${esc(el.id)}">${drawElement(el)}${text}${handles}</g>`;
   }
 
   const text = label ? `<text class="label" y="48">${label}</text>` : '';
-  return `<g class="${cls}" data-id="${el.id}" transform="translate(${el.x} ${el.y})">
+  return `<g class="${cls}" data-id="${esc(el.id)}" transform="translate(${el.x} ${el.y})">
     ${drawElement(el)}
     <rect class="sel-box" x="-44" y="-42" width="88" height="${label ? 100 : 84}" rx="6"/>
     ${text}
@@ -36,7 +36,7 @@ export function drawScheme(svg, scheme, { selectedId, mode }) {
 // в режиме работы только обновляем классы и значения, чтобы не сбивать анимацию
 export function applyRuntime(svg, scheme, values) {
   for (const el of scheme.elements) {
-    const g = svg.querySelector(`[data-id="${el.id}"]`);
+    const g = svg.querySelector(`[data-id="${CSS.escape(el.id)}"]`);
     if (!g) continue;
     const s = visualState(el, values);
 

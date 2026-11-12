@@ -1,16 +1,25 @@
 import { TYPES, createElement } from './elements.js';
+import { findTag } from './tags.js';
 
 export const WIDTH = 1000;
 export const HEIGHT = 600;
+
+// номер элемента попадает в разметку и в селекторы, поэтому разрешаем только буквы, цифры, _ и -
+const ID_PATTERN = /^[\w-]{1,32}$/;
 
 export function serialize(scheme) {
   return JSON.stringify({ version: 1, elements: scheme.elements });
 }
 
 function coord(value, max) {
-  const n = Number(value);
-  if (!Number.isFinite(n)) throw new Error('В файле неверные координаты');
-  return Math.min(max, Math.max(0, n));
+  if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('В файле неверные координаты');
+  return Math.min(max, Math.max(0, value));
+}
+
+function cleanText(value, maxLength) {
+  if (value === undefined || value === null) return '';
+  if (typeof value !== 'string') throw new Error('В файле неверный текст');
+  return value.slice(0, maxLength);
 }
 
 // файл может быть любым, поэтому всё проверяем и подчищаем
@@ -27,15 +36,21 @@ export function parse(text) {
 
   const ids = new Set();
   const elements = data.elements.map((raw) => {
-    if (!raw || !TYPES[raw.type]) throw new Error('Неизвестный элемент в файле');
+    // Object.hasOwn: иначе под тип подошли бы "toString" и "__proto__" из прототипа объекта
+    if (!raw || typeof raw.type !== 'string' || !Object.hasOwn(TYPES, raw.type)) {
+      throw new Error('Неизвестный элемент в файле');
+    }
+    if (typeof raw.id !== 'string' || !ID_PATTERN.test(raw.id)) throw new Error('В файле неверный номер элемента');
     const el = {
-      id: String(raw.id),
+      id: raw.id,
       type: raw.type,
       x: coord(raw.x, WIDTH),
       y: coord(raw.y, HEIGHT),
-      label: String(raw.label ?? '').slice(0, 40),
-      tag: String(raw.tag ?? ''),
+      label: cleanText(raw.label, 40),
+      tag: cleanText(raw.tag, 40),
     };
+    // тег должен существовать и подходить элементу по типу, иначе отвязываем
+    if (el.tag && findTag(el.tag)?.type !== TYPES[el.type].tagType) el.tag = '';
     if (raw.type === 'pipe') {
       el.x2 = coord(raw.x2, WIDTH);
       el.y2 = coord(raw.y2, HEIGHT);

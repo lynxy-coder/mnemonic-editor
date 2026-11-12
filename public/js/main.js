@@ -223,7 +223,20 @@ setInterval(() => {
   updateTagLabels();
 }, 1000);
 
-redraw();
+try {
+  redraw();
+} catch (err) {
+  // сохранённая схема не рисуется (например, файл повреждён): возвращаемся к примеру
+  console.error(err);
+  scheme = sampleScheme();
+  selectedId = null;
+  save();
+  redraw();
+}
 
 // ссылка с #run открывает схему сразу в режиме работы
-if (location.hash === '#run') document.querySelector('[data-mode-btn="run"]').click();
+function applyHash() {
+  if (location.hash === '#run' && mode !== 'run') document.querySelector('[data-mode-btn="run"]').click();
+}
+window.addEventListener('hashchange', applyHash);
+applyHash();
