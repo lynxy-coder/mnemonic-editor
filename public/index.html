@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Редактор мнемосхем</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-mode="edit">
+  <header class="top">
+    <h1>Редактор мнемосхем</h1>
+
+    <div class="modes" role="group" aria-label="Режим">
+      <button type="button" data-mode-btn="edit" class="active">Редактирование</button>
+      <button type="button" data-mode-btn="run">Работа</button>
+    </div>
+
+    <div class="tools edit-only">
+      <button type="button" id="undo" title="Ctrl+Z">Отменить</button>
+      <button type="button" id="redo" title="Ctrl+Y">Повторить</button>
+      <button type="button" id="save">Сохранить в файл</button>
+      <button type="button" id="load">Загрузить файл</button>
+      <button type="button" id="sample">Пример</button>
+      <button type="button" id="clear">Очистить</button>
+      <input type="file" id="file" accept=".json,application/json" hidden>
+    </div>
+  </header>
+
+  <main>
+    <aside class="palette edit-only">
+      <h2>Элементы</h2>
+      <p class="hint">Перетащите на поле или нажмите</p>
+      <div id="palette"></div>
+    </aside>
+
+    <section class="canvas">
+      <svg id="svg" viewBox="0 0 1000 600" role="img" aria-label="Мнемосхема">
+        <defs>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M20 0H0V20" fill="none" class="grid-line"/>
+          </pattern>
+        </defs>
+        <rect id="grid-rect" width="1000" height="600" fill="url(#grid)"/>
+        <g id="layer"></g>
+      </svg>
+    </section>
+
+    <aside class="side" id="side"></aside>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

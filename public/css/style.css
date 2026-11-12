@@ -1,0 +1,326 @@
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-2: #273449;
+  --border: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --ok: #22c55e;
+  --alarm: #ef4444;
+  --pipe: #475569;
+  --flow: #38bdf8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 10px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+h2 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.modes button {
+  border-radius: 0;
+}
+.modes button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+.modes button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+.modes .active {
+  background: var(--accent);
+  color: #0f172a;
+  border-color: var(--accent);
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 170px 1fr 280px;
+  gap: 12px;
+  padding: 12px 20px;
+}
+
+.palette,
+.side,
+.canvas {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  overflow: auto;
+}
+
+.canvas {
+  padding: 0;
+  display: flex;
+}
+
+.hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#palette button {
+  display: block;
+  width: 100%;
+  margin-bottom: 6px;
+  text-align: left;
+  cursor: grab;
+}
+
+body[data-mode='run'] .edit-only {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* схема */
+svg {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  touch-action: none;
+}
+
+.grid-line {
+  stroke: var(--border);
+  stroke-width: 0.5;
+  opacity: 0.6;
+}
+
+svg[data-mode='run'] #grid-rect {
+  display: none;
+}
+
+.el {
+  cursor: move;
+}
+svg[data-mode='run'] .el {
+  cursor: default;
+}
+
+.body {
+  fill: var(--surface);
+  stroke: var(--muted);
+  stroke-width: 2.5;
+}
+
+.el .label {
+  fill: var(--muted);
+  font-size: 13px;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.el .value {
+  fill: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.sel-box {
+  display: none;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  pointer-events: none;
+}
+.selected .sel-box {
+  display: block;
+}
+
+/* вентилятор и насос */
+.el-fan .rotor path {
+  fill: var(--muted);
+}
+.tri {
+  fill: var(--muted);
+}
+svg[data-mode='run'] .running .body {
+  stroke: var(--ok);
+}
+svg[data-mode='run'] .running .rotor path,
+svg[data-mode='run'] .running .tri {
+  fill: var(--ok);
+}
+svg[data-mode='run'] .el-fan.running .rotor {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* клапан */
+.bar-bg {
+  fill: var(--surface-2);
+  stroke: var(--border);
+}
+.bar {
+  fill: var(--accent);
+}
+svg[data-mode='run'] .open .body {
+  stroke: var(--accent);
+}
+
+/* датчик */
+svg[data-mode='run'] .alarm .body {
+  stroke: var(--alarm);
+}
+svg[data-mode='run'] .alarm .value {
+  fill: var(--alarm);
+}
+
+/* труба */
+.pipe-bg {
+  stroke: var(--pipe);
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+.pipe-flow {
+  stroke: var(--flow);
+  stroke-width: 4;
+  stroke-dasharray: 10 14;
+  opacity: 0;
+}
+.hit {
+  stroke: transparent;
+  stroke-width: 22;
+}
+svg[data-mode='run'] .flowing .pipe-flow {
+  opacity: 1;
+  animation: flow 0.7s linear infinite;
+}
+@keyframes flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.handle {
+  fill: var(--accent);
+  stroke: var(--bg);
+  stroke-width: 2;
+  cursor: crosshair;
+}
+
+/* правая панель */
+.side label,
+.tag {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.side input[type='text'],
+.side select {
+  width: 100%;
+}
+
+.side .tag {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+}
+.side .tag span {
+  flex: 1 1 100%;
+  text-align: left;
+}
+.side .tag input[type='range'] {
+  flex: 1;
+  padding: 0;
+}
+.side .tag b {
+  min-width: 40px;
+  text-align: left;
+  color: var(--text);
+}
+
+.danger:hover {
+  border-color: var(--alarm) !important;
+}
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+  .canvas {
+    min-height: 320px;
+  }
+}
